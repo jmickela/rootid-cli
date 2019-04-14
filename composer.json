@@ -1,0 +1,18 @@
+{
+    "name": "jmickela/rootid-cli",
+    "description": "Simple CLI to automate development workflows at Rootid.com",
+    "authors": [
+        {
+            "name": "Jason Neumark Mickela",
+            "email": "jason@rootid.com"
+        }
+    ],
+    "require": {
+        "consolidation/robo": "^1"
+    },
+    "autoload":{
+        "psr-4":{
+            "RootidCLI\\":"src"
+        }
+    }
+}

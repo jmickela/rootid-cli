@@ -1,0 +1,48 @@
+#!/usr/bin/env php
+<?php
+
+// If we're running from phar load the phar autoload file.
+$pharPath = \Phar::running(true);
+if ($pharPath) {
+    $autoloaderPath = "$pharPath/vendor/autoload.php";
+} else {
+    if (file_exists(__DIR__.'/vendor/autoload.php')) {
+        $autoloaderPath = __DIR__.'/vendor/autoload.php';
+    } elseif (file_exists(__DIR__.'/../../autoload.php')) {
+        $autoloaderPath = __DIR__ . '/../../autoload.php';
+    } elseif (file_exists(__DIR__.'/../vendor/autoload.php')) {
+        $autoloaderPath = __DIR__ . '/../vendor/autoload.php';
+    } else {
+        die("Could not find autoloader. Run 'composer install'.");
+    }
+}
+$classLoader = require $autoloaderPath;
+
+
+use RootidCLI\Rootid;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Robo\Robo;
+
+define('BASE_DIR', dirname(__DIR__, 1));
+
+
+// Get the current directory, if it's a git repo then assume this IS a pantheon site repo and change the working directory
+// to match the git root.
+$code = @exec('git rev-parse --show-toplevel 2>&1', $output);
+
+if(!empty($output) && count($output) > 0 && $output[0] != 'fatal: not a git repository (or any of the parent directories): .git') {
+    chdir($output[0]);
+} else {
+    // TODO: What do you do if you aren't in a repo? How is that info carried forward.
+
+    // fwrite(STDERR, "\033[31mCould not find a git repository, are you in the right directory?\033[0m\n");
+    // return 1;
+}
+
+$input = new ArgvInput($argv);
+$output = new ConsoleOutput();
+$config = Robo::createConfiguration([getenv('HOME') . "/.robo/robo.yml", "pantheon.yml"]);
+$app = new Rootid($config, $input, $output);
+$status_code = $app->run($input, $output);
+exit($status_code);
