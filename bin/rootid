@@ -4,19 +4,15 @@
 // If we're running from phar load the phar autoload file.
 $pharPath = \Phar::running(true);
 if ($pharPath) {
-    $autoloaderPath = "$pharPath/vendor/autoload.php";
+    include_once("$pharPath/vendor/autoload.php");
+} elseif (file_exists($path = __DIR__ . '/../vendor/autoload.php')
+    || file_exists($path = __DIR__ . '/../../autoload.php')
+    || file_exists($path = __DIR__ . '/../../../autoload.php')
+) {
+    include_once($path);
 } else {
-    if (file_exists(__DIR__.'/vendor/autoload.php')) {
-        $autoloaderPath = __DIR__.'/vendor/autoload.php';
-    } elseif (file_exists(__DIR__.'/../../autoload.php')) {
-        $autoloaderPath = __DIR__ . '/../../autoload.php';
-    } elseif (file_exists(__DIR__.'/../vendor/autoload.php')) {
-        $autoloaderPath = __DIR__ . '/../vendor/autoload.php';
-    } else {
-        die("Could not find autoloader. Run 'composer install'.");
-    }
+    throw new \Exception('Could not locate autoload.php');
 }
-$classLoader = require $autoloaderPath;
 
 
 use RootidCLI\Rootid;
