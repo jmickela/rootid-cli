@@ -14,5 +14,13 @@
         "psr-4":{
             "RootidCLI\\":"src"
         }
-    }
+    },
+    "bin": [
+        "bin/rootid"
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    }    
 }
