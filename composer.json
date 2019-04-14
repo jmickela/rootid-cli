@@ -8,7 +8,8 @@
         }
     ],
     "require": {
-        "consolidation/robo": "^1"
+        "consolidation/robo": "^1",
+        "pantheon-systerms/terminus": "^2"
     },
     "autoload":{
         "psr-4":{
