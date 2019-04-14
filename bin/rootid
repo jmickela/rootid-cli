@@ -38,7 +38,7 @@ if(!empty($output) && count($output) > 0 && $output[0] != 'fatal: not a git repo
 
 $input = new ArgvInput($argv);
 $output = new ConsoleOutput();
-$config = Robo::createConfiguration([getenv('HOME') . "/.robo/robo.yml", "pantheon.yml"]);
+$config = Robo::createConfiguration([getenv('HOME') . "/.rootid.yml", getenv('HOME') . "/.robo/robo.yml", "pantheon.yml"]);
 $app = new Rootid($config, $input, $output);
 $status_code = $app->run($input, $output);
 exit($status_code);
