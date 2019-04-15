@@ -38,11 +38,11 @@ const config = {
     },
     "engine": "chrome",
     "report": [ "CLI" ],
-    "casperFlags": [],
+    //"casperFlags": [],
     "debug": false,
     "port": 3001,
-    "asyncCaptureLimit": 5,
-    "asyncCompareLimit": 5,
+    "asyncCaptureLimit": 3,
+    "asyncCompareLimit": 3,
 
     "scenarios": []
 };
@@ -51,27 +51,51 @@ const config = {
 config.scenarios = [];
 
 backstop_paths.forEach(function(path) {
-    if(path.selectors) {
-        path.selectors.forEach(function(selectors) {
-            config.scenarios.push({
-                'label': path.label,
-                'url': testUrl + path.path,
-                'referenceUrl': refUrl + path.path,
-                'misMatchThreshold': misMatchThresh,
-                'selectors': selectors,
-                'delay': 300
-            });    
-        });
+    var test = {
+        'label': path.label,
+        'url': testUrl + path.path,
+        'referenceUrl': refUrl + path.path,
+        'misMatchThreshold': misMatchThresh,
+        'delay': 300,
+    };
+
+    if(path.selectors !== undefined) {
+        test.selectors = path.selectors;
     } else {
-        config.scenarios.push({
-            'label': path.label,
-            'url': testUrl + path.path,
-            'referenceUrl': refUrl + path.path,
-            'misMatchThreshold': misMatchThresh,
-            'delay': 300
-        });
+        test.selectors = ["body"];
     }
+
+    if(path.removeSelectors !== undefined) {
+        test.removeSelectors = path.removeSelectors;
+    }
+
+    config.scenarios.push(test);
 });
+
+
+    // if(path.selectors) {
+    //     path.selectors.forEach(function(selectors) {
+    //         config.scenarios.push({
+    //             'label': path.label,
+    //             'url': testUrl + path.path,
+    //             'referenceUrl': refUrl + path.path,
+    //             'misMatchThreshold': misMatchThresh,
+    //             'selectors': selectors,
+    //             'delay': 300,
+    //             'removeSelectors': path.removeSelectors
+    //         });    
+    //     });
+    // } else {
+    //     config.scenarios.push({
+    //         'label': path.label,
+    //         'url': testUrl + path.path,
+    //         'referenceUrl': refUrl + path.path,
+    //         'misMatchThreshold': misMatchThresh,
+    //         'delay': 300,
+    //         'removeSelectors': path.removeSelectors
+    //     });
+    // }
+//});
 
 
 
