@@ -24,4 +24,13 @@ trait SiteInfo {
         
         return $output;
     }
+
+    function getLocalSiteRoot($site) {
+        $path = 'http://' . $site->name . '.' . \Robo\Robo::config()->get('options.local_domain');
+        if(\Robo\Robo::config()->get('web_docroot')) {
+            $path .= '/web';
+        }
+
+        return $path;
+    }
 }

@@ -9,13 +9,17 @@ class RunSiteTests extends \Robo\Tasks {
     use SiteInfo;
     use SiteOperations;
 
+    public function __construct() {
+        $this->backstop_config = BASE_DIR . "/test-runners/backstop-config.js";
+    }
+
     /**
      * Runs tests against the local version of the site.
      *
      * @command test
      *
      * @option env Specific site environment to sync from.
-     * @option init If set this will create references images as well as run a test.
+     * @option generate If set this will create references images as well as run a test.
      *
      * @usage --machine-token=<machine_token> Logs in a user granted the machine token <machine_token>.
      * @usage Logs in a user with a previously saved machine token.
@@ -29,7 +33,19 @@ class RunSiteTests extends \Robo\Tasks {
             //TODO: Use terminus to verify this env exists.
         }
 
+        $ref_url = "https://" . $options['env'] . '-' . $site_data->name . ".pantheonsite.io";
+        $test_url = $this->getLocalSiteRoot($site_data);
+
+        // See /test-runners/backstop-config.js for when these get used.
+        $_ENV['BACKSTOP_REF_URL'] = $ref_url;
+        $_ENV['BACKSTOP_TEST_URL'] = $test_url;
+
+        
+
         chdir('./.tests');
+
+        $tests = file_get_contents('elements.json');
+        $_ENV['TEST_ELEMENTS'] = $tests;
 
         if($options['generate']) {
             $this->generateReferenceImages();
@@ -41,12 +57,12 @@ class RunSiteTests extends \Robo\Tasks {
     }
 
     private function generateReferenceImages() {
-        $this->taskExec('backstop')->args('referance', '--config=backstop.js')->run();
+        $this->taskExec('backstop')->args('reference', '--config=' . $this->backstop_config)->run();
     }
 
     private function runVisualRegressionTests() {
         // Run the tests set up in the ROOT/.tests/backstop.js file.
-
-        $this->taskExec('backstop')->args('test', '--config=backstop.js')->run();
+        $this->taskExec('backstop')->args('test', '--config=' . $this->backstop_config)->run();
+        $this->taskExec('backstop')->args('openReport', '--config=' . $this->backstop_config)->run();
     }
 }
