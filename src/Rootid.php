@@ -45,7 +45,8 @@ class Rootid implements ConfigAwareInterface, ContainerAwareInterface {
     $this->commands = [
       'RootidCLI\\Commands\\Sync\\SyncSiteData',
       'RootidCLI\\Commands\\Site\\SiteImport',
-      'RootidCLI\\Commands\\Test\\RunSiteTests'
+      'RootidCLI\\Commands\\Test\\RunSiteTests',
+      'RootidCLI\\Commands\\Site\\SiteUpdate'
     ];
   }
 }

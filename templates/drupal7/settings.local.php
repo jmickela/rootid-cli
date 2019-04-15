@@ -4,9 +4,9 @@
 if (!defined('PANTHEON_ENVIRONMENT')) {
   // Database.
   $databases['default']['default'] = array(
-    'database' => 'LOCAL_DATABASE_NAME_PLACEHOLDER',
-    'username' => 'MYSQL_USERNAME_PLACEHOLDER',
-    'password' => 'MYSQL_PASSWORD_PLACEHOLDER',
+    'database' => 'DB_NAME_PLACEHOLDER',
+    'username' => 'DB_USER_PLACEHOLDER',
+    'password' => 'DB_PASS_PLACEHOLDER',
     'host' => 'localhost',
     'driver' => 'mysql',
     'port' => 3306,

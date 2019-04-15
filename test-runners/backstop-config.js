@@ -2,7 +2,7 @@
 
 const refUrl = process.env.BACKSTOP_REF_URL;
 const testUrl = process.env.BACKSTOP_TEST_URL;
-const misMatchThresh = 0.9;
+const misMatchThresh = 10.0;
 
 const backstop_paths = JSON.parse(process.env.TEST_ELEMENTS);
 

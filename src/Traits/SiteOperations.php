@@ -69,19 +69,6 @@ trait SiteOperations {
         $this->_exec('rm ' . $tmp_file);
     }
 
-    private function getSettingsDirectory($site) {
-        $path = '.';
-        // TODO: get this working!
-        // open pantheon.ym, look for web_docroot, if true, add /web
-
-        if($site->framework == 'wordpress') {
-            return $path;
-        } elseif($site->framework == 'drupal7') {
-            return $path . '/sites/default';
-        } elseif($site->framework == 'drupal8') {
-            return $path . '/sites/default';
-        }
-    }
 
     private function getTerminusSite($site_slug, $env) {
         return "{$site_slug}.{$env}";
@@ -89,6 +76,22 @@ trait SiteOperations {
 
     private function getDatabaseName($site_slug) {
         return str_replace('-', '_', $site_slug);
+    }
+
+    private function getSettingsDirectory($site) {
+        $path = '.';
+        
+        if(\Robo\Robo::config()->get('web_docroot') && in_array($site->framework, ['drupal', 'drupal8'])) {
+            $path .= '/web';
+        }
+
+        if($site->framework == 'wordpress') {
+            return $path;
+        } elseif($site->framework == 'drupal') {
+            return $path . '/sites/default';
+        } elseif($site->framework == 'drupal8') {
+            return $path . '/sites/default';
+        }
     }
 
     private function getFilesDir($site) {
@@ -99,7 +102,7 @@ trait SiteOperations {
             $path .= "/web";
         }
 
-        if($site->framework == 'drupal8' || $site->framework == 'drupal7') {
+        if($site->framework == 'drupal8' || $site->framework == 'drupal') {
             $path .= "/sites/default/files";
         } elseif($site->framework == 'wordpress') {
             $path .= "/wp-content/uploads";

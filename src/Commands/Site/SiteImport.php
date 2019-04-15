@@ -66,7 +66,7 @@ class SiteImport extends \Robo\Tasks {
         ];
         $settings_dir = $this->getSettingsDirectory($site);
 
-        if($site->framework == 'drupal7') { // DRUPAL 7 ===============================================
+        if($site->framework == 'drupal') { // DRUPAL 7 ===============================================
             $settings_file = file_get_contents(BASE_DIR . '/templates/drupal7/settings.local.php');
             foreach($replacement_patterns as $key => $val) {
                 $settings_file = str_replace($key, $val, $settings_file);
@@ -105,6 +105,8 @@ class SiteImport extends \Robo\Tasks {
     }
 
     private function createDatabase($db_name) {
+        $config = \Robo\Robo::config();
+        
         // connect to the MySQL server
         $conn = mysqli_connect('localhost', $config->get('options.db_username'), $config->get('options.db_password'));
 
@@ -114,11 +116,11 @@ class SiteImport extends \Robo\Tasks {
         }
 
         // Check to see if the database already exists, if it does, just drop it.
-        $result = mysqli_query("SHOW DATABASES LIKE '$db_name';");
+        $result = mysqli_query($conn, "SHOW DATABASES LIKE '$db_name';");
         $row = $result->fetch_assoc();
         if($row != null) {
             $sql = "DROP $db_name";
-            mysqli_query($sql);
+            mysqli_query($conn, $sql);
         }
 
         // sql query with CREATE DATABASE
