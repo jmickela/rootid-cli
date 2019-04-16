@@ -13,10 +13,56 @@ class RunSiteTests extends \Robo\Tasks {
         $this->backstop_config = BASE_DIR . "/test-runners/backstop-config.js";
     }
 
+
     /**
      * Runs tests against the local version of the site.
      *
-     * @command test
+     * @command cypress:run
+     *
+     *
+     * @usage --machine-token=<machine_token> Logs in a user granted the machine token <machine_token>.
+     * @usage Logs in a user with a previously saved machine token.
+     * @usage --email=<email> Logs in a user with a previously saved machine token belonging to <email>.
+     * 
+     * @alias cypruss
+     */
+    public function runIntegrationTests() {
+        $site_data = $this->getSite();
+
+        $test_url = $this->getLocalSiteRoot($site_data);
+
+        $_ENV['CYPRESS_BASE_URL'] = $test_url;
+
+        chdir('./.tests');
+
+        //$tests = file_get_contents('elements.json');
+        //$_ENV['TEST_ELEMENTS'] = $tests;
+
+        //if($options['generate']) {
+        //    $this->generateReferenceImages();
+        //}
+
+        $this->runCypressTests($test_url);        
+    }
+
+    /**
+     * Runs tests against the local version of the site.
+     *
+     * @command cypress:open
+     *
+     */
+    public function openIntegrationTestResults() {
+        $site_data = $this->getSite();
+        $test_url = $this->getLocalSiteRoot($site_data);
+        $_ENV['CYPRESS_BASE_URL'] = $test_url;
+        chdir('./.tests');
+        $this->openCypressTestResults($test_url);
+    }
+
+    /**
+     * Runs tests against the local version of the site.
+     *
+     * @command backstop
      *
      * @option env Specific site environment to sync from.
      * @option generate If set this will create references images as well as run a test.
@@ -40,8 +86,6 @@ class RunSiteTests extends \Robo\Tasks {
         $_ENV['BACKSTOP_REF_URL'] = $ref_url;
         $_ENV['BACKSTOP_TEST_URL'] = $test_url;
 
-        
-
         chdir('./.tests');
 
         $tests = file_get_contents('elements.json');
@@ -51,9 +95,7 @@ class RunSiteTests extends \Robo\Tasks {
             $this->generateReferenceImages();
         }
 
-        $this->runVisualRegressionTests();
-
-        
+        $this->runVisualRegressionTests();        
     }
 
     private function generateReferenceImages() {
@@ -64,5 +106,13 @@ class RunSiteTests extends \Robo\Tasks {
         // Run the tests set up in the ROOT/.tests/backstop.js file.
         $this->taskExec('backstop')->args('test', '--config=' . $this->backstop_config)->run();
         $this->taskExec('backstop')->args('openReport', '--config=' . $this->backstop_config)->run();
+    }
+
+    private function runCypressTests($base_path) {
+        $this->taskExec('cypress')->args('run', '--env')->rawArg('BASE_PATH=' . $base_path)->run();
+    }
+
+    private function openCypressTestResults($test_url) {
+        $this->taskExec('cypress')->args('open', '--env')->rawArg('BASE_PATH=' . $base_path)->run();
     }
 }

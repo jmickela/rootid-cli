@@ -22,7 +22,6 @@ use Robo\Robo;
 
 define('BASE_DIR', dirname(__DIR__, 1));
 
-
 // Get the current directory, if it's a git repo then assume this IS a pantheon site repo and change the working directory
 // to match the git root.
 $code = @exec('git rev-parse --show-toplevel 2>&1', $output);

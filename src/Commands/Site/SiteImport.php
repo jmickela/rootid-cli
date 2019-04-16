@@ -4,6 +4,7 @@ namespace RootidCLI\Commands\Site;
 
 use RootidCLI\Traits\SiteInfo;
 use RootidCLI\Traits\SiteOperations;
+use Robo\Robo;
 
 use Symfony\Component\Console\Question\Question;
 
@@ -57,6 +58,9 @@ class SiteImport extends \Robo\Tasks {
         // Change to the site directory
         chdir('./' . $answer);
 
+        // At this point, there may be a new pantheon.yml file, load it so we know if there is a /web directory.
+        Robo::loadConfiguration(["pantheon.yml"]);
+
         // Copy templates and fill in their data.
 
         $replacement_patterns = [
@@ -74,7 +78,6 @@ class SiteImport extends \Robo\Tasks {
 
             file_put_contents($settings_dir . '/settings.local.php', $settings_file);
         } elseif($site->framework == 'drupal8') { // DRUPAL 8 =====================================
-
             $settings_file = file_get_contents(BASE_DIR . '/templates/drupal8/settings.local.php');
             foreach($replacement_patterns as $key => $val) {
                 $settings_file = str_replace($key, $val, $settings_file);
