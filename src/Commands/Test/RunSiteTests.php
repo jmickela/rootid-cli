@@ -55,7 +55,6 @@ class RunSiteTests extends \Robo\Tasks {
         $site_data = $this->getSite();
         $test_url = $this->getLocalSiteRoot($site_data);
         $_ENV['CYPRESS_BASE_URL'] = $test_url;
-        // chdir('./.tests');
         $this->openCypressTestResults($test_url);
     }
 
