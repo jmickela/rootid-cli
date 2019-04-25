@@ -36,23 +36,22 @@ trait SiteOperations {
 
         // Check connection
         if (mysqli_connect_errno()) {
-        exit('Connect failed: '. mysqli_connect_error());
+            exit('Connect failed: '. mysqli_connect_error());
         }
 
         // Define sql queries to create and drop databases:
         $create_database = "CREATE DATABASE " . $table;
         $drop_database = "DROP DATABASE " . $table;
 
-
         // First, check to see whether the database already exists
         if (mysqli_select_db($conn, $table)) {
-        // If it exists, drop it -- we want a fresh start
-        if ($conn->query($drop_database) === TRUE) {
-            // echo "Old database " . $table . " successfully dropped\n";
-        }
-        else {
-        echo 'Error: '. $conn->error;
-        }
+            // If it exists, drop it -- we want a fresh start
+            if ($conn->query($drop_database) === TRUE) {
+                // echo "Old database " . $table . " successfully dropped\n";
+            }
+            else {
+                echo 'Error: '. $conn->error;
+            }
         } 
 
         // Then create the new database
@@ -60,7 +59,7 @@ trait SiteOperations {
             // echo "New database " . $table . " successfully created\n";
         }
         else {
-        echo 'Error: '. $conn->error;
+            echo 'Error: '. $conn->error;
         }
 
         $conn->close();
