@@ -30,6 +30,39 @@ trait SiteOperations {
         $this->taskExec('terminus')->args('backup:create', $terminus_site, '--element=db')->run();
         $this->say('Downloading backup file.');
         $this->taskExec('terminus')->args('backup:get', $terminus_site, "--to=" . $db_file, '--element=db')->run();
+
+        // Connect to the MySQL server
+        $conn = new \mysqli('localhost', $user, $pass);
+
+        // Check connection
+        if (mysqli_connect_errno()) {
+            exit('Connect failed: '. mysqli_connect_error());
+        }
+
+        // Define sql queries to create and drop databases:
+        $create_database = "CREATE DATABASE " . $table;
+        $drop_database = "DROP DATABASE " . $table;
+
+        // First, check to see whether the database already exists
+        if (mysqli_select_db($conn, $table)) {
+            // If it exists, drop it -- we want a fresh start
+            if ($conn->query($drop_database) === TRUE) {
+                // echo "Old database " . $table . " successfully dropped\n";
+            }
+            else {
+                echo 'Error: '. $conn->error;
+            }
+        } 
+
+        // Then create the new database
+        if ($conn->query($create_database) === TRUE) {
+            // echo "New database " . $table . " successfully created\n";
+        }
+        else {
+            echo 'Error: '. $conn->error;
+        }
+
+        $conn->close();
         
         $this->say('Unzipping and importing data');
 
