@@ -33,7 +33,7 @@ class RunSiteTests extends \Robo\Tasks {
 
         $_ENV['CYPRESS_BASE_URL'] = $test_url;
 
-        chdir('./.tests');
+        //chdir('./.tests');
 
         //$tests = file_get_contents('elements.json');
         //$_ENV['TEST_ELEMENTS'] = $tests;
@@ -55,7 +55,6 @@ class RunSiteTests extends \Robo\Tasks {
         $site_data = $this->getSite();
         $test_url = $this->getLocalSiteRoot($site_data);
         $_ENV['CYPRESS_BASE_URL'] = $test_url;
-        chdir('./.tests');
         $this->openCypressTestResults($test_url);
     }
 
@@ -113,6 +112,11 @@ class RunSiteTests extends \Robo\Tasks {
     }
 
     private function openCypressTestResults($test_url) {
-        $this->taskExec('cypress')->args('open', '--env')->rawArg('BASE_PATH=' . $base_path)->run();
+        $this
+            ->taskExec('cypress')
+            ->args('open', '--env')
+            ->rawArg('BASE_PATH=' . $test_url)
+            ->rawArg('--project ./.tests')
+            ->run();
     }
 }

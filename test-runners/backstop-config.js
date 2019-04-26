@@ -69,6 +69,10 @@ backstop_paths.forEach(function(path) {
         test.removeSelectors = path.removeSelectors;
     }
 
+    if(path.delay !== undefined) {
+        test.delay = path.delay;
+    }
+
     config.scenarios.push(test);
 });
 
