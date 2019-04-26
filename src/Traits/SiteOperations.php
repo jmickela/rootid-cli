@@ -94,6 +94,9 @@ trait SiteOperations {
         $this->say('Unzipping archive');
 
         @$this->taskExec('tar')->args('-xvf', $tmp_file , '-C', $tmp)->rawArg('>/dev/null')->run();
+        if(file_exists ($tmp .'/files_' . $env . '/.htaccess')) {
+            $this->_exec('rm ' . $tmp . '/files_' . $env. '/.htaccess');
+        }
         $this->say('Copying Files');
         $this->_copyDir($tmp .'/files_' . $env, $path);
 
