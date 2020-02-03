@@ -15,11 +15,11 @@ class SiteImport extends \Robo\Tasks {
 
     /**
      * Imports a site
-     * 
+     *
      * This is more involved than it sounds. It should do a code/db/files import first.
      * then it should import
-     * 
-     * 
+     *
+     *
      *
      * @command import
      * @option env Specific site environment to sync from.
@@ -85,7 +85,7 @@ class SiteImport extends \Robo\Tasks {
 
             file_put_contents($settings_dir . '/settings.local.php', $settings_file);
 
-            copy(BASE_DIR . "/templates/drupal8/settings.local.yml", $settings_dir . "/settings.local.yml");
+            copy(BASE_DIR . "/templates/drupal8/settings.local.php", $settings_dir . "/settings.local.php");
 
         } elseif($site->framework == 'wordpress') { // WORDPRESS =======================================
             $settings_file = file_get_contents(BASE_DIR . '/templates/wordpress/wp-config-local.php');
@@ -103,13 +103,13 @@ class SiteImport extends \Robo\Tasks {
         $this->fetchSiteDB($site->name, $options['env']);
 
         // Import files
-        
+
         $this->fetchSiteFiles($site, $options['env']);
     }
 
     private function createDatabase($db_name) {
         $config = \Robo\Robo::config();
-        
+
         // connect to the MySQL server
         $conn = mysqli_connect('localhost', $config->get('options.db_username'), $config->get('options.db_password'));
 
