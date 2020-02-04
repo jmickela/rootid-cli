@@ -22,11 +22,11 @@ trait SiteOperations {
         $pass = \Robo\Robo::config()->get('options.db_pass');
         $tmp = \Robo\Robo::config()->get('options.tmp_directory');
         $table = $this->getDatabaseName($site_slug);
-        $terminus_site = $this->getTerminusSite($site_slug, $env); 
+        $terminus_site = $this->getTerminusSite($site_slug, $env);
 
         $db_file = sprintf("%s/%s.sql.gz", $tmp, $site_slug);
 
-        $this->say('Creating backup on Pantheon.');
+        $this->say('Creating database backup on Pantheon.');
         $this->taskExec('terminus')->args('backup:create', $terminus_site, '--element=db')->run();
         $this->say('Downloading backup file.');
         $this->taskExec('terminus')->args('backup:get', $terminus_site, "--to=" . $db_file, '--element=db')->run();
@@ -36,7 +36,7 @@ trait SiteOperations {
 
         // Check connection
         if (mysqli_connect_errno()) {
-            exit('Connect failed: '. mysqli_connect_error());
+            exit('Connect failed: ' . mysqli_connect_error());
         }
 
         // Define sql queries to create and drop databases:
@@ -48,30 +48,28 @@ trait SiteOperations {
             // If it exists, drop it -- we want a fresh start
             if ($conn->query($drop_database) === TRUE) {
                 // echo "Old database " . $table . " successfully dropped\n";
+            } else {
+                echo 'Error: ' . $conn->error;
             }
-            else {
-                echo 'Error: '. $conn->error;
-            }
-        } 
+        }
 
         // Then create the new database
         if ($conn->query($create_database) === TRUE) {
             // echo "New database " . $table . " successfully created\n";
-        }
-        else {
-            echo 'Error: '. $conn->error;
+        } else {
+            echo 'Error: ' . $conn->error;
         }
 
         $conn->close();
-        
+
         $this->say('Unzipping and importing data');
 
         $mysql = "mysql";
-        if(!empty($user)) {
-          $mysql .= " -u {$user}";
+        if (!empty($user)) {
+            $mysql .= " -u {$user}";
         }
-        if(!empty($pass)) {
-          $mysql .= " -p{$pass}";
+        if (!empty($pass)) {
+            $mysql .= " -p{$pass}";
         }
         $mysql .= ' ' . $table;
 
@@ -85,20 +83,20 @@ trait SiteOperations {
         $pantheon_site = $this->getTerminusSite($site->name, $env);
         $tmp = \Robo\Robo::config()->get('options.tmp_directory');
         $tmp_file = sprintf("%s/%s.tar.gz", $tmp, $site->name);
-        
-        $this->say('Creating Site Archive on Pantheon.');
+
+        $this->say('Creating file backup on Pantheon.');
 
         $this->taskExec('terminus')->args('backup:create', $pantheon_site, '--element=files')->run();
         $this->say('Downloading files.');
         $this->taskExec('terminus')->args('backup:get', $pantheon_site, '--to=' . $tmp_file, '--element=files')->run();
         $this->say('Unzipping archive');
 
-        @$this->taskExec('tar')->args('-xvf', $tmp_file , '-C', $tmp)->rawArg('>/dev/null')->run();
-        if(file_exists ($tmp .'/files_' . $env . '/.htaccess')) {
-            $this->_exec('rm ' . $tmp . '/files_' . $env. '/.htaccess');
+        @$this->taskExec('tar')->args('-xvf', $tmp_file, '-C', $tmp)->rawArg('>/dev/null')->run();
+        if (file_exists($tmp . '/files_' . $env . '/.htaccess')) {
+            $this->_exec('rm ' . $tmp . '/files_' . $env . '/.htaccess');
         }
         $this->say('Copying Files');
-        $this->_copyDir($tmp .'/files_' . $env, $path);
+        $this->_copyDir($tmp . '/files_' . $env, $path);
 
         $this->say('Removing downloaded Files.');
         $this->_exec('rm -rf ' . $tmp . '/files_' . $env);
@@ -114,18 +112,20 @@ trait SiteOperations {
         return str_replace('-', '_', $site_slug);
     }
 
+    // note that this function needs to be called after changing into the site directory
     private function getSettingsDirectory($site) {
-        $path = '.';
-        
-        if(\Robo\Robo::config()->get('web_docroot') && in_array($site->framework, ['drupal', 'drupal8'])) {
+        $cur_dir = explode('\\', getcwd());
+        $path = $cur_dir[0];
+
+        if (\Robo\Robo::config()->get('web_docroot') && in_array($site->framework, ['drupal', 'drupal8'])) {
             $path .= '/web';
         }
 
-        if($site->framework == 'wordpress') {
+        if ($site->framework == 'wordpress') {
             return $path;
-        } elseif($site->framework == 'drupal') {
+        } elseif ($site->framework == 'drupal') {
             return $path . '/sites/default';
-        } elseif($site->framework == 'drupal8') {
+        } elseif ($site->framework == 'drupal8') {
             return $path . '/sites/default';
         }
     }
@@ -134,13 +134,13 @@ trait SiteOperations {
         $in_web_dir = \Robo\Robo::config()->get('web_docroot');
 
         $path = ".";
-        if($in_web_dir) {
+        if ($in_web_dir) {
             $path .= "/web";
         }
 
-        if($site->framework == 'drupal8' || $site->framework == 'drupal') {
+        if ($site->framework == 'drupal8' || $site->framework == 'drupal') {
             $path .= "/sites/default/files";
-        } elseif($site->framework == 'wordpress') {
+        } elseif ($site->framework == 'wordpress') {
             $path .= "/wp-content/uploads";
         }
 
