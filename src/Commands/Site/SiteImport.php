@@ -39,7 +39,7 @@ class SiteImport extends \Robo\Tasks {
 
         $site = $this->getSite($answer);
 
-        if(!is_object($site)) {
+        if (!is_object($site)) {
             // Most likely cause is terminus not finding a site for some reason.
             return 1;
         }
@@ -47,7 +47,7 @@ class SiteImport extends \Robo\Tasks {
         $db_name = $this->getDatabaseName($site->name);
 
         // Make sure this site isn't already installed:
-        if(file_exists('./' . $answer)) {
+        if (file_exists('./' . $answer)) {
             $this->yell('Project directory already exists, please use sync instead of importing again.', 60, 'red');
             return 1;
         }
@@ -70,30 +70,39 @@ class SiteImport extends \Robo\Tasks {
         ];
         $settings_dir = $this->getSettingsDirectory($site);
 
-        if($site->framework == 'drupal') { // DRUPAL 7 ===============================================
-            $settings_file = file_get_contents(BASE_DIR . '/templates/drupal7/settings.local.php');
-            foreach($replacement_patterns as $key => $val) {
-                $settings_file = str_replace($key, $val, $settings_file);
+        if ($site->framework == 'drupal') { // DRUPAL 7 ===============================================
+            $settings_file_contents = file_get_contents(BASE_DIR . '/templates/drupal7/settings.local.php');
+
+            // plug in site- and user-specific values
+            foreach ($replacement_patterns as $key => $val) {
+                $settings_file_contents = str_replace($key, $val, $settings_file_contents);
             }
 
-            file_put_contents($settings_dir . '/settings.local.php', $settings_file);
-        } elseif($site->framework == 'drupal8') { // DRUPAL 8 =====================================
-            $settings_file = file_get_contents(BASE_DIR . '/templates/drupal8/settings.local.php');
-            foreach($replacement_patterns as $key => $val) {
-                $settings_file = str_replace($key, $val, $settings_file);
+            // set up settings.local.php
+            file_put_contents($settings_dir . '/settings.local.php', $settings_file_contents);
+        } elseif ($site->framework == 'drupal8') { // DRUPAL 8 =====================================
+            $settings_file_contents = file_get_contents(BASE_DIR . '/templates/drupal8/settings.local.php');
+
+            // plug in site- and user-specific values
+            foreach ($replacement_patterns as $key => $val) {
+                $settings_file_contents = str_replace($key, $val, $settings_file_contents);
             }
 
-            file_put_contents($settings_dir . '/settings.local.php', $settings_file);
+            // set up settings.local.php
+            file_put_contents($settings_dir . '/settings.local.php', $settings_file_contents);
 
-            copy(BASE_DIR . "/templates/drupal8/settings.local.php", $settings_dir . "/settings.local.php");
+            // copy services.local.yml
+            copy(BASE_DIR . "/templates/drupal8/services.local.yml", $settings_dir . "/services.local.yml");
+        } elseif ($site->framework == 'wordpress') { // WORDPRESS =======================================
+            $settings_file_contents = file_get_contents(BASE_DIR . '/templates/wordpress/wp-config-local.php');
 
-        } elseif($site->framework == 'wordpress') { // WORDPRESS =======================================
-            $settings_file = file_get_contents(BASE_DIR . '/templates/wordpress/wp-config-local.php');
-            foreach($replacement_patterns as $key => $val) {
-                $settings_file = str_replace($key, $val, $settings_file);
+            // plug in site- and user-specific values
+            foreach ($replacement_patterns as $key => $val) {
+                $settings_file_contents = str_replace($key, $val, $settings_file_contents);
             }
 
-            file_put_contents($settings_dir . '/wp-config-local.php', $settings_file);
+            // set up wp-config-local.php
+            file_put_contents($settings_dir . '/wp-config-local.php', $settings_file_contents);
         }
 
         // Create database
@@ -103,8 +112,18 @@ class SiteImport extends \Robo\Tasks {
         $this->fetchSiteDB($site->name, $options['env']);
 
         // Import files
-
         $this->fetchSiteFiles($site, $options['env']);
+
+        // Clear Drupal cache
+        if ($site->framework == 'drupal8') {
+            echo ("Clearing cache... \n");
+            shell_exec("drush cr");
+            echo ("Cache cleared \n");
+        } elseif ($site->framework == 'drupal') {
+            echo ("Clearing cache... \n");
+            shell_exec("drush cc all");
+            echo ("Cache cleared \n");
+        }
     }
 
     private function createDatabase($db_name) {
@@ -115,25 +134,32 @@ class SiteImport extends \Robo\Tasks {
 
         // check connection
         if (mysqli_connect_errno()) {
-            exit('Connect failed: '. mysqli_connect_error());
+            exit('Connect failed: ' . mysqli_connect_error());
         }
 
         // Check to see if the database already exists, if it does, just drop it.
         $result = mysqli_query($conn, "SHOW DATABASES LIKE '$db_name';");
+
         $row = $result->fetch_assoc();
-        if($row != null) {
-            $sql = "DROP $db_name";
-            mysqli_query($conn, $sql);
+
+        if ($row != null) {
+            $sql = "DROP DATABASE $db_name";
+            echo ("Dropping the old database: ");
+
+            if (mysqli_query($conn, $sql)) {
+                echo ("Record deleted successfully \n");
+            } else {
+                echo ("\n Error deleting record: " . mysqli_error($conn) . "\n");
+            }
         }
 
         // sql query with CREATE DATABASE
         $sql = "CREATE DATABASE `" . $db_name . "` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
         // Performs the $sql query on the server to create the database
         if (mysqli_query($conn, $sql) === TRUE) {
-            echo 'Database "tests" successfully created';
-        }
-        else {
-            echo 'Error: '. $conn->error;
+            echo ("Database " . $db_name . " successfully created \n");
+        } else {
+            echo ('Error: ' . $conn->error . "\n");
         }
         mysqli_close($conn);
     }
