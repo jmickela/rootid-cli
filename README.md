@@ -14,4 +14,9 @@ To install type:
 
 `composer global require jmickela/rootid-cli`
 
+though you may wish to consider using cgr (https://github.com/consolidation/cgr)
+in which case you would type:
+
+`cgr jmickela/rootid-cli`
+
 To verify it is installed, just run the rootid command.
