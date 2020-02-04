@@ -29,11 +29,12 @@ if (!defined('PANTHEON_ENVIRONMENT')) {
   /**
    * Disable/bypass the Drupal Render API cache
    */
+
+  $settings['container_yamls'][] = __DIR__ . '/services.local.yml';
   $settings['cache']['bins']['render'] = 'cache.backend.null';
 
 
   $settings['hash_salt'] = 'my_random_hash';
-  $settings['container_yamls'][] = __DIR__ . '/services.local.yml';
 
   /**
    * Error Logging
@@ -53,8 +54,8 @@ if (!defined('PANTHEON_ENVIRONMENT')) {
 
 
   /**
-  *For Drupal 8 with subfolder install:
-  */
+   * For Drupal 8 with subfolder install:
+   */
   // $base_url = 'http://site_folder_name.whatever_domain';
   // if (isset($GLOBALS['request']) && '/web/index.php' === $GLOBALS['request']->server->get('SCRIPT_NAME')) {
   //   $GLOBALS['request']->server->set('SCRIPT_NAME', '/index.php');
