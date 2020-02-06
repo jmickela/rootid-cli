@@ -29,7 +29,7 @@ class SiteImport extends \Robo\Tasks {
      * @usage Logs in a user with a previously saved machine token.
      * @usage --email=<email> Logs in a user with a previously saved machine token belonging to <email>.
      */
-    public function doImport($options = ['env' => 'live']) {
+    public function doImport($options = ['env' => 'dev']) {
         $sites = $this->getSiteList();
         $config = \Robo\Robo::config();
 

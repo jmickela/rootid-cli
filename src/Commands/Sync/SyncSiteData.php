@@ -22,7 +22,7 @@ class SyncSiteData extends \Robo\Tasks {
      * @usage Logs in a user with a previously saved machine token.
      * @usage --email=<email> Logs in a user with a previously saved machine token belonging to <email>.
      */
-    public function doSync($options = ['nodb' => NULL, 'files' => NULL, 'env' => 'live']) {
+    public function doSync($options = ['nodb' => NULL, 'files' => NULL, 'env' => 'dev']) {
         $site_data = $this->getSite();
 
         // If the env isn't live, dev, or test, then make sure the env actually exists on Pantheon.
