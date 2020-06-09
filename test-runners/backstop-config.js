@@ -9,23 +9,23 @@ const backstop_paths = JSON.parse(process.env.TEST_ELEMENTS);
 const config = {
     'id': 'backstop_default',
     "viewports": [
-        // {
-        //     "name": "phone",
-        //     "width": 320,
-        //     "height": 480
-        // },
         {
-            "name": "tablet_v",
-            "width": 568,
+            "label": "phone",
+            "width": 320,
+            "height": 480
+        },
+        {
+            "label": "tablet_v",
+            "width": 768,
             "height": 1024
         },
         {
-            "name": "tablet_h",
+            "label": "tablet_h",
             "width": 1024,
             "height": 768
         },
         {
-            "name": "desktop",
+            "label": "desktop",
             "width": 1920,
             "height": 1080
         }
@@ -36,7 +36,7 @@ const config = {
         "compare_data": "/tmp/artifacts/backstop_data/bitmaps_test/compare.json",
         "casper_scripts": "backstop_data/casper_scripts"
     },
-    "engine": "chrome",
+    "engine": "puppeteer",
     "report": [ "CLI" ],
     //"casperFlags": [],
     "debug": false,
@@ -65,16 +65,42 @@ backstop_paths.forEach(function(path) {
         test.selectors = ["body"];
     }
 
-    if(path.removeSelectors !== undefined) {
-        test.removeSelectors = path.removeSelectors;
-    }
+    var otherScenarioProperties = [
+      'onBeforeScript',
+      'cookiePath',
+      'readyEvent',
+      'readySelector',
+      'delay',
+      'hideSelectors',
+      'removeSelectors',
+      'onReadyScript',
+      'keyPressSelectors',
+      'hoverSelector',
+      'hoverSelectors',
+      'clickSelector',
+      'clickSelectors',
+      'postInteractionWait',
+      'scrollToSelector',
+      'selectors',
+      'selectorExpansion',
+      'misMatchThreshold',
+      'requireSameDimensions',
+      'viewports',
+    ];
 
-    if(path.delay !== undefined) {
-        test.delay = path.delay;
-    }
+    otherScenarioProperties.forEach(function(property) {
+        if (path[property] !== undefined) {
+            test[property] = path[property];
+        }
+    });
 
     config.scenarios.push(test);
+
+    console.log(config.scenarios);
 });
+
+
+
 
 
     // if(path.selectors) {
@@ -87,7 +113,7 @@ backstop_paths.forEach(function(path) {
     //             'selectors': selectors,
     //             'delay': 300,
     //             'removeSelectors': path.removeSelectors
-    //         });    
+    //         });
     //     });
     // } else {
     //     config.scenarios.push({
