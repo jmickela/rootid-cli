@@ -2,9 +2,11 @@
 
 namespace RootidCLI\Traits;
 
-trait SiteInfo {
+trait SiteInfo
+{
 
-    function getSite($site_name='') {
+    function getSite($site_name = '')
+    {
         $out = shell_exec("terminus site:info {$site_name} --format=json");
         $out = json_decode($out);
         return $out;
@@ -13,23 +15,25 @@ trait SiteInfo {
     /**
      * Returns an array of site slugs that the user has access to.
      */
-    function getSiteList() {
+    function getSiteList()
+    {
         $sites = shell_exec('terminus site:list --format=json');
         $sites = json_decode($sites);
         $output = [];
 
-        foreach($sites as $key => $site) {
+        foreach ($sites as $key => $site) {
             $output[] = $site->name;
         }
-        
+
         return $output;
     }
 
-    function getLocalSiteRoot($site) {
+    function getLocalSiteRoot($site)
+    {
         $path = 'http://' . $site->name . '.' . \Robo\Robo::config()->get('options.local_domain');
-        if(\Robo\Robo::config()->get('web_docroot')) {
-            $path .= '/web';
-        }
+        // if(\Robo\Robo::config()->get('web_docroot')) {
+        //     $path .= '/web';
+        // }
 
         return $path;
     }
