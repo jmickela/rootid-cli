@@ -90,7 +90,8 @@ class RunSiteTests extends \Robo\Tasks {
             }
         }
         else {
-            $ref_url = "https://" . $options['env'] . '-' . $site_data->name . ".pantheonsite.io";
+            // TODO: Currently hard-coding http auth, but this should be configurable.
+            $ref_url = "https://rootid:rootid@" . $options['env'] . '-' . $site_data->name . ".pantheonsite.io";
         }
 
         if ($options['test'] !== NULL) {

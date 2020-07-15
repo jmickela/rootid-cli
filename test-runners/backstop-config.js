@@ -57,8 +57,8 @@ const config = {
   // uncomment debugWindow to see Chromium at work!
   // debugWindow: true,
   port: 3001,
-  asyncCaptureLimit: 3,
-  asyncCompareLimit: 3,
+  asyncCaptureLimit: 1,
+  asyncCompareLimit: 8,
   scenarios: [],
 };
 
