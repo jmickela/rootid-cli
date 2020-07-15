@@ -25,5 +25,7 @@ module.exports = async (page, scenario) => {
     );
   };
   await setCookies();
-  console.log('Cookie state restored with:', JSON.stringify(cookies, null, 2));
+  
+  // TODO: only output if debug is enabled.
+  //console.log('Cookie state restored with:', JSON.stringify(cookies, null, 2));
 };
