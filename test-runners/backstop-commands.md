@@ -70,11 +70,29 @@ Here's an example of a bare minimum elements.json file:
         "wait": integer    // how long to wait after disabling the scroll reveal
       },
       {
-        "type": "disableLazyload",
+        "type": "disableLazyload", // immediately loads all lazyload images
         "wait": integer    // how long to wait after disabling the lazyload
       },
       {
-        "type": "pauseSlick",
+        "type": "pauseSlick", // pauses slick sliders
+        "wait": integer    // how long to wait after pausing all sliders
+      },
+      {
+        "type": "pauseOwl", // pauses owl sliders
+        "wait": integer    // how long to wait after pausing all sliders
+      },
+      {
+        "type": "applyVanillaCode", // this is to use built-in functions on DOM objects, such as style
+        "selector": "some_selector",
+        "expand": true, // this defaults to false. If true, it uses a forEach on querySelectorAll, otherwise it just uses the first instance, aka querySelector (with no all)
+        "code": "style.border='1px dashed purple'", // the code you would type after querySelector("some_selector").[whatever you would type here] -- note that you need to use single quotes to distinguish from the double quotes that have to be around a json string
+        "wait": integer    // how long to wait after pausing all sliders
+      },
+      {
+        "type": "applyJQueryCode", // this is to use jQuery functions on jQuery objects, such as `hide()`
+        "selector": "some_selector",
+        "expand": true, // this defaults to false. If true, it applies the function to all objects that match the selector, otherwise it just uses the first matching object
+        "code": "css('border','1px dashed purple')", // the code you would type after querySelector("some_selector").[whatever you would type here] -- note that you need to use single quotes to distinguish from the double quotes that have to be around a json string
         "wait": integer    // how long to wait after pausing all sliders
       }
     ],
