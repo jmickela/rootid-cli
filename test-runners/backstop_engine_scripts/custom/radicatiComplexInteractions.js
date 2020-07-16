@@ -1,5 +1,4 @@
 module.exports = async (page, scenario) => {
-
   var rainbow = String.fromCodePoint(0x1f308);
   var complexInteraction = scenario.complexInteraction;
 
@@ -11,15 +10,16 @@ module.exports = async (page, scenario) => {
   ) {
     for (interaction of complexInteraction) {
       if (interaction.type == "hover") {
-        console.log("  Hovering over " + interaction.selector);
         await page.waitFor(interaction.selector);
         await page.hover(interaction.selector);
+        console.log("  Hovering over " + interaction.selector);
         if (interaction.wait) {
           await page.waitFor(interaction.wait);
         }
       }
 
       if (interaction.type == "click") {
+        await page.waitFor(interaction.selector);
         await page.evaluate((interaction) => {
           document.querySelector(interaction.selector).click();
         }, interaction);
@@ -31,10 +31,10 @@ module.exports = async (page, scenario) => {
 
       if (interaction.type == "keypress") {
         await page.waitFor(interaction.selector);
+        await page.type(interaction.selector, interaction.keyPress);
         console.log(
           "  Typing " + interaction.keyPress + " in " + interaction.selector
         );
-        await page.type(interaction.selector, interaction.keyPress);
         if (interaction.wait) {
           await page.waitFor(interaction.wait);
         }
@@ -43,10 +43,10 @@ module.exports = async (page, scenario) => {
       if (interaction.type == "scroll") {
         var selector = interaction.selector;
         await page.waitFor(selector);
-        console.log("  Scrolling to " + selector);
         await page.evaluate((selector) => {
           document.querySelector(selector).scrollIntoView();
         }, selector);
+        console.log("  Scrolled to " + selector);
         if (interaction.wait) {
           await page.waitFor(interaction.wait);
         }
@@ -97,8 +97,63 @@ module.exports = async (page, scenario) => {
           ) {
             var sliders = jQuery(".slick-slider");
             sliders.slick("slickPause");
+            // start would be sliders.slick("slickPlay");
           }
         });
+        if (interaction.wait) {
+          await page.waitFor(interaction.wait);
+        }
+      }
+
+      if (interaction.type == "pauseOwl") {
+        await page.evaluate(() => {
+          if (
+            typeof jQuery !== "undefined" &&
+            typeof jQuery.fn.owlCarousel !== "undefined"
+          ) {
+            var sliders = jQuery(".owl-carousel");
+            sliders.trigger("stop.owl.autoplay");
+            // start would be sliders.trigger('play.owl.autoplay');
+          }
+        });
+        if (interaction.wait) {
+          await page.waitFor(interaction.wait);
+        }
+      }
+
+      if (interaction.type == "applyJQueryCode") {
+        await page.evaluate((interaction) => {
+          if (typeof jQuery !== "undefined") {
+            var elements = jQuery(interaction.selector);
+            if (interaction.expand == true) {
+              eval("elements." + interaction.code);
+            } else {
+              var element = jQuery(elements[0]);
+              // The internet agrees -- using eval is "killing kittens" level bad :P
+              // But... it works :shrug:
+              eval("element." + interaction.code);
+            }
+          }
+        }, interaction);
+        if (interaction.wait) {
+          await page.waitFor(interaction.wait);
+        }
+      }
+
+      if (interaction.type == "applyVanillaCode") {
+        await page.evaluate((interaction) => {
+          if (interaction.expand == true) {
+            var elements = document.querySelectorAll(interaction.selector);
+            elements.forEach(function (element) {
+              // The internet agrees -- using eval is "killing kittens" level bad :P
+              // But... it works :shrug:
+              eval("element." + interaction.code);
+            }, interaction);
+          } else {
+            element = document.querySelector(interaction.selector);
+            eval("element." + interaction.code);
+          }
+        }, interaction);
         if (interaction.wait) {
           await page.waitFor(interaction.wait);
         }
