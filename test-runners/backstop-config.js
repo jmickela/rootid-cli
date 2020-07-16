@@ -54,11 +54,13 @@ const config = {
   },
   report: ["CLI"],
   debug: false,
+  // Helps resolve issue with misaligned screenshots
+  puppeteerOffscreenCaptureFix: true,
   // uncomment debugWindow to see Chromium at work!
   // debugWindow: true,
   port: 3001,
   asyncCaptureLimit: 1,
-  asyncCompareLimit: 8,
+  asyncCompareLimit: 4,
   scenarios: [],
 };
 
